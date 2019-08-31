@@ -34,7 +34,7 @@ void setup() {
   }
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("Rodrigo", "rodrigo2549");
+  WiFiMulti.addAP("id", "senha");
 
   pinMode(led, OUTPUT);
   digitalWrite(led, 1);
