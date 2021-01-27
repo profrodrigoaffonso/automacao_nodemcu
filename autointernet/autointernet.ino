@@ -17,6 +17,8 @@
 ESP8266WiFiMulti WiFiMulti;
 
 int led = 13;
+int bt = 15;
+int acionado = 0;
 
 void setup() {
 
@@ -34,14 +36,27 @@ void setup() {
   }
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("id", "senha");
+  WiFiMulti.addAP("", "");
 
   pinMode(led, OUTPUT);
+ pinMode(bt, INPUT);
   digitalWrite(led, 1);
 
 }
 
 void loop() {
+
+
+  if(digitalRead(bt) == HIGH){
+    if(acionado == 1){
+      acionado = 0;
+    } else {
+      acionado = 1;
+    }
+  }
+
+  Serial.println(acionado);
+  
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
@@ -50,7 +65,7 @@ void loop() {
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
-    if (http.begin(client, "http://10.0.0.108/casa/comando")) {  // HTTP
+    if (http.begin(client, "http://10.0.0.104/commands/send/1")) {  // HTTP
 
 
       Serial.print("[HTTP] GET...\n");
@@ -65,12 +80,14 @@ void loop() {
         // file found at server
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
           String comando = http.getString();
-          if(comando=="ledon"){
-            digitalWrite(led, 0);
+          if(comando=="on"){
+            acionado = 1;
+            //digitalWrite(led, 0);
           }
           //Comando para desacionar o módulo relé
-          if(comando=="ledoff"){
-            digitalWrite(led, 1);
+          if(comando=="off"){
+            acionado = 0;
+            //digitalWrite(led, 1);
           }
           Serial.println(comando);
         }
@@ -83,6 +100,13 @@ void loop() {
       Serial.printf("[HTTP} Unable to connect\n");
     }
   }
+  Serial.println(acionado);
+  if(acionado == 1){
+    digitalWrite(led, 0);
+  } else {
+    digitalWrite(led, 1);
+  }
+  
 
-  delay(10000);
+  delay(3000);
 }
