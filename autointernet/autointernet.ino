@@ -16,9 +16,9 @@
 
 ESP8266WiFiMulti WiFiMulti;
 
-int led = 13;
-int bt = 15;
-int acionado = 0;
+int led = 13; // saida para o rele
+int bt = 15; // controle manual
+int acionado = 0; 
 
 void setup() {
 
@@ -46,8 +46,8 @@ void setup() {
 
 void loop() {
 
-
-  if(digitalRead(bt) == HIGH){
+  
+  if(digitalRead(bt) == HIGH){ // quando o botao manual esta acionado altera o status
     if(acionado == 1){
       acionado = 0;
     } else {
@@ -63,7 +63,7 @@ void loop() {
     WiFiClient client;
 
     HTTPClient http;
-
+    // leitura do comando via web
     Serial.print("[HTTP] begin...\n");
     if (http.begin(client, "http://10.0.0.104/commands/send/1")) {  // HTTP
 
@@ -80,11 +80,12 @@ void loop() {
         // file found at server
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
           String comando = http.getString();
+          // se o comando for on altera o status acionado para 1
           if(comando=="on"){
             acionado = 1;
             //digitalWrite(led, 0);
           }
-          //Comando para desacionar o módulo relé
+          // se o comando for on altera o status acionado para 0
           if(comando=="off"){
             acionado = 0;
             //digitalWrite(led, 1);
@@ -101,10 +102,11 @@ void loop() {
     }
   }
   Serial.println(acionado);
+  // le o status acionado
   if(acionado == 1){
-    digitalWrite(led, 0);
+    digitalWrite(led, LOW); // aciona o modulo rele
   } else {
-    digitalWrite(led, 1);
+    digitalWrite(led, HIGH); // desaciona o modulo rele
   }
   
 
